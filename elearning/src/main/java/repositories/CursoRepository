@@ -1,0 +1,97 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class CursoRepository {
+    private Connection conn;
+
+    public CursoRepository() throws SQLException {
+        this.conn = DatabaseConnection.getConnection();
+    }
+
+    public void closeConnection() throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+        }
+    }
+
+    public void crearCurso(Curso curso) throws SQLException {
+        String sql = "INSERT INTO curso (descripcion_curso, fecha_inicio_curso, fecha_fin_curso, nombre_curso, plan_estudio, porcentaje_aprobacion) VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, curso.getDescripcionCurso());
+            stmt.setDate(2, new java.sql.Date(curso.getFechaInicioCurso().getTime()));
+            stmt.setDate(3, new java.sql.Date(curso.getFechaFinCurso().getTime()));
+            stmt.setString(4, curso.getNombreCurso());
+            stmt.setString(5, curso.getPlanEstudio());
+            stmt.setInt(6, curso.getPorcentajeAprobacion());
+            stmt.executeUpdate();
+        }
+    }
+
+    public Curso obtenerCursoPorId(Long id) throws SQLException {
+        String sql = "SELECT * FROM curso WHERE cod_curso = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Curso(
+                            rs.getLong("cod_curso"),
+                            rs.getString("descripcion_curso"),
+                            new Date(rs.getDate("fecha_inicio_curso").getTime()),
+                            new Date(rs.getDate("fecha_fin_curso").getTime()),
+                            rs.getString("nombre_curso"),
+                            rs.getString("plan_estudio"),
+                            rs.getInt("porcentaje_aprobacion")
+                    );
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<Curso> obtenerTodosLosCursos() throws SQLException {
+        List<Curso> cursos = new ArrayList<>();
+        String sql = "SELECT * FROM curso";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Curso curso = new Curso(
+                        rs.getLong("cod_curso"),
+                        rs.getString("descripcion_curso"),
+                        new Date(rs.getDate("fecha_inicio_curso").getTime()),
+                        new Date(rs.getDate("fecha_fin_curso").getTime()),
+                        rs.getString("nombre_curso"),
+                        rs.getString("plan_estudio"),
+                        rs.getInt("porcentaje_aprobacion")
+                );
+                cursos.add(curso);
+            }
+        }
+        return cursos;
+    }
+
+    public void actualizarCurso(Curso curso) throws SQLException {
+        String sql = "UPDATE curso SET descripcion_curso = ?, fecha_inicio_curso = ?, fecha_fin_curso = ?, nombre_curso = ?, plan_estudio = ?, porcentaje_aprobacion = ? WHERE cod_curso = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, curso.getDescripcionCurso());
+            stmt.setDate(2, new java.sql.Date(curso.getFechaInicioCurso().getTime()));
+            stmt.setDate(3, new java.sql.Date(curso.getFechaFinCurso().getTime()));
+            stmt.setString(4, curso.getNombreCurso());
+            stmt.setString(5, curso.getPlanEstudio());
+            stmt.setInt(6, curso.getPorcentajeAprobacion());
+            stmt.setLong(7, curso.getCodCurso());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void eliminarCurso(Long id) throws SQLException {
+        String sql = "DELETE FROM curso WHERE cod_curso = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        }
+    }
+}

@@ -1,0 +1,85 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ClaseRepository {
+    private Connection conn;
+
+    public ClaseRepository() throws SQLException {
+        this.conn = DatabaseConnection.getConnection();
+    }
+
+    public void closeConnection() throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+        }
+    }
+
+    public void crearClase(Clase clase) throws SQLException {
+        String sql = "INSERT INTO clase (fecha_clase, tema_clase, curso_id) VALUES (?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, new java.sql.Date(clase.getFechaClase().getTime()));
+            stmt.setString(2, clase.getTemaClase());
+            stmt.setLong(3, clase.getCurso().getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    public Clase obtenerClasePorId(Long id) throws SQLException {
+        String sql = "SELECT * FROM clase WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Clase(
+                            rs.getLong("id"),
+                            new Date(rs.getDate("fecha_clase").getTime()),
+                            rs.getString("tema_clase"),
+                            new Curso(rs.getLong("curso_id")) // Suponiendo que tienes un constructor en Curso para el ID
+                    );
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<Clase> obtenerTodasLasClases() throws SQLException {
+        List<Clase> clases = new ArrayList<>();
+        String sql = "SELECT * FROM clase";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Clase clase = new Clase(
+                        rs.getLong("id"),
+                        new Date(rs.getDate("fecha_clase").getTime()),
+                        rs.getString("tema_clase"),
+                        new Curso(rs.getLong("curso_id")) // Suponiendo que tienes un constructor en Curso para el ID
+                );
+                clases.add(clase);
+            }
+        }
+        return clases;
+    }
+
+    public void actualizarClase(Clase clase) throws SQLException {
+        String sql = "UPDATE clase SET fecha_clase = ?, tema_clase = ?, curso_id = ? WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, new java.sql.Date(clase.getFechaClase().getTime()));
+            stmt.setString(2, clase.getTemaClase());
+            stmt.setLong(3, clase.getCurso().getId());
+            stmt.setLong(4, clase.getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void eliminarClase(Long id) throws SQLException {
+        String sql = "DELETE FROM clase WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        }
+    }
+}

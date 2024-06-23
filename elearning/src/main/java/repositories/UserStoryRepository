@@ -1,0 +1,111 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class UserStoryRepository {
+    private Connection conn;
+
+    public UserStoryRepository() throws SQLException {
+        this.conn = DatabaseConnection.getConnection();
+    }
+
+    public void closeConnection() throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+        }
+    }
+
+    public void crearUserStory(UserStory userStory) throws SQLException {
+        String sql = "INSERT INTO user_story (cantidadHorasSprints, costoUS, descripcionUS, fechaHoraFinVigenciaUS, modalidadUS, storyPoints, epic_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setFloat(1, userStory.getCantidadHorasSprints());
+            stmt.setFloat(2, userStory.getCostoUS());
+            stmt.setString(3, userStory.getDescripcionUS());
+            stmt.setTimestamp(4, new java.sql.Timestamp(userStory.getFechaHoraFinVigenciaUS().getTime()));
+            stmt.setString(5, userStory.getModalidadUS());
+            stmt.setInt(6, userStory.getStoryPoints());
+            stmt.setLong(7, userStory.getEpic().getCodEpic()); // Aquí asumo que getCodEpic() devuelve el ID del Epic asociado
+            stmt.executeUpdate();
+        }
+    }
+
+    public UserStory obtenerUserStoryPorId(Long id) throws SQLException {
+        String sql = "SELECT * FROM user_story WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    UserStory userStory = new UserStory();
+                    userStory.setId(rs.getLong("id"));
+                    userStory.setCantidadHorasSprints(rs.getFloat("cantidadHorasSprints"));
+                    userStory.setCostoUS(rs.getFloat("costoUS"));
+                    userStory.setDescripcionUS(rs.getString("descripcionUS"));
+                    userStory.setFechaHoraFinVigenciaUS(new Date(rs.getTimestamp("fechaHoraFinVigenciaUS").getTime()));
+                    userStory.setModalidadUS(rs.getString("modalidadUS"));
+                    userStory.setStoryPoints(rs.getInt("storyPoints"));
+                    
+                    // Para obtener el Epic asociado (relación ManyToOne)
+                    Epic epic = new Epic();
+                    epic.setCodEpic(rs.getLong("epic_id"));
+                    userStory.setEpic(epic);
+                    
+                    return userStory;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<UserStory> obtenerTodosLosUserStories() throws SQLException {
+        List<UserStory> userStories = new ArrayList<>();
+        String sql = "SELECT * FROM user_story";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                UserStory userStory = new UserStory();
+                userStory.setId(rs.getLong("id"));
+                userStory.setCantidadHorasSprints(rs.getFloat("cantidadHorasSprints"));
+                userStory.setCostoUS(rs.getFloat("costoUS"));
+                userStory.setDescripcionUS(rs.getString("descripcionUS"));
+                userStory.setFechaHoraFinVigenciaUS(new Date(rs.getTimestamp("fechaHoraFinVigenciaUS").getTime()));
+                userStory.setModalidadUS(rs.getString("modalidadUS"));
+                userStory.setStoryPoints(rs.getInt("storyPoints"));
+                
+                // Para obtener el Epic asociado (relación ManyToOne)
+                Epic epic = new Epic();
+                epic.setCodEpic(rs.getLong("epic_id"));
+                userStory.setEpic(epic);
+                
+                userStories.add(userStory);
+            }
+        }
+        return userStories;
+    }
+
+    public void actualizarUserStory(UserStory userStory) throws SQLException {
+        String sql = "UPDATE user_story SET cantidadHorasSprints = ?, costoUS = ?, descripcionUS = ?, fechaHoraFinVigenciaUS = ?, modalidadUS = ?, storyPoints = ?, epic_id = ? WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setFloat(1, userStory.getCantidadHorasSprints());
+            stmt.setFloat(2, userStory.getCostoUS());
+            stmt.setString(3, userStory.getDescripcionUS());
+            stmt.setTimestamp(4, new java.sql.Timestamp(userStory.getFechaHoraFinVigenciaUS().getTime()));
+            stmt.setString(5, userStory.getModalidadUS());
+            stmt.setInt(6, userStory.getStoryPoints());
+            stmt.setLong(7, userStory.getEpic().getCodEpic());
+            stmt.setLong(8, userStory.getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void eliminarUserStory(Long id) throws SQLException {
+        String sql = "DELETE FROM user_story WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        }
+    }
+}

@@ -1,0 +1,20 @@
+package com.elearning.entity;
+
+import lombok.Data;
+import javax.persistence.*;
+import java.util.Date;
+import java.util.List;
+
+@Entity
+@Data
+public class TipoUsuario {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long codTipoUsuario;
+
+    private String nombreTipoUsuario;
+    private Date fechaHoraFinVigenciaTipoUsuario;
+
+    @OneToMany(mappedBy = "tipoUsuario")
+    private List<Usuario> usuarios;
+}

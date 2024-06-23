@@ -1,0 +1,89 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class PreguntaRepository {
+    private Connection conn;
+
+    public PreguntaRepository() throws SQLException {
+        this.conn = DatabaseConnection.getConnection();
+    }
+
+    public void closeConnection() throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+        }
+    }
+
+    public void crearPregunta(Pregunta pregunta) throws SQLException {
+        String sql = "INSERT INTO pregunta (enunciadoPregunta, fechaHoraFinVigenciaPregunta) VALUES (?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, pregunta.getEnunciadoPregunta());
+            stmt.setTimestamp(2, new java.sql.Timestamp(pregunta.getFechaHoraFinVigenciaPregunta().getTime()));
+            stmt.executeUpdate();
+        }
+    }
+
+    public Pregunta obtenerPreguntaPorId(Long id) throws SQLException {
+        String sql = "SELECT * FROM pregunta WHERE codPregunta = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Pregunta pregunta = new Pregunta();
+                    pregunta.setCodPregunta(rs.getLong("codPregunta"));
+                    pregunta.setEnunciadoPregunta(rs.getString("enunciadoPregunta"));
+                    pregunta.setFechaHoraFinVigenciaPregunta(new Date(rs.getTimestamp("fechaHoraFinVigenciaPregunta").getTime()));
+                    // Obtener las opciones asociadas a esta pregunta
+                    OpcionRepository opcionRepository = new OpcionRepository();
+                    pregunta.setOpciones(opcionRepository.obtenerOpcionesPorPreguntaId(rs.getLong("codPregunta")));
+                    opcionRepository.closeConnection();
+                    return pregunta;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<Pregunta> obtenerTodasLasPreguntas() throws SQLException {
+        List<Pregunta> preguntas = new ArrayList<>();
+        String sql = "SELECT * FROM pregunta";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Pregunta pregunta = new Pregunta();
+                pregunta.setCodPregunta(rs.getLong("codPregunta"));
+                pregunta.setEnunciadoPregunta(rs.getString("enunciadoPregunta"));
+                pregunta.setFechaHoraFinVigenciaPregunta(new Date(rs.getTimestamp("fechaHoraFinVigenciaPregunta").getTime()));
+                // Obtener las opciones asociadas a esta pregunta
+                OpcionRepository opcionRepository = new OpcionRepository();
+                pregunta.setOpciones(opcionRepository.obtenerOpcionesPorPreguntaId(rs.getLong("codPregunta")));
+                opcionRepository.closeConnection();
+                preguntas.add(pregunta);
+            }
+        }
+        return preguntas;
+    }
+
+    public void actualizarPregunta(Pregunta pregunta) throws SQLException {
+        String sql = "UPDATE pregunta SET enunciadoPregunta = ?, fechaHoraFinVigenciaPregunta = ? WHERE codPregunta = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, pregunta.getEnunciadoPregunta());
+            stmt.setTimestamp(2, new java.sql.Timestamp(pregunta.getFechaHoraFinVigenciaPregunta().getTime()));
+            stmt.setLong(3, pregunta.getCodPregunta());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void eliminarPregunta(Long id) throws SQLException {
+        String sql = "DELETE FROM pregunta WHERE codPregunta = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        }
+    }
+}

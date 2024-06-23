@@ -1,0 +1,17 @@
+package com.elearning.entity;
+
+import lombok.Data;
+import javax.persistence.*;
+import java.util.Date;
+
+@Entity
+@Data
+public class Material {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long codMaterial;
+
+    private String nombreMaterial;
+    private Date fechaHoraFinVigenciaMaterial;
+    private String linkMaterial;
+}

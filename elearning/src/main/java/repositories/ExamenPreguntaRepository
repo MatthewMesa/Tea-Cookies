@@ -1,0 +1,96 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ExamenPreguntaRepository {
+    private Connection conn;
+
+    public ExamenPreguntaRepository() throws SQLException {
+        this.conn = DatabaseConnection.getConnection();
+    }
+
+    public void closeConnection() throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+        }
+    }
+
+    public void crearExamenPregunta(ExamenPregunta examenPregunta) throws SQLException {
+        String sql = "INSERT INTO examen_pregunta (orden_pregunta, puntaje_pregunta, examen_id, pregunta_id) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, examenPregunta.getOrdenPregunta());
+            stmt.setFloat(2, examenPregunta.getPuntajePregunta());
+            stmt.setLong(3, examenPregunta.getExamen().getId());
+            stmt.setLong(4, examenPregunta.getPregunta().getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    public ExamenPregunta obtenerExamenPreguntaPorId(Long id) throws SQLException {
+        String sql = "SELECT * FROM examen_pregunta WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    ExamenPregunta examenPregunta = new ExamenPregunta();
+                    examenPregunta.setId(rs.getLong("id"));
+                    examenPregunta.setOrdenPregunta(rs.getInt("orden_pregunta"));
+                    examenPregunta.setPuntajePregunta(rs.getFloat("puntaje_pregunta"));
+                    // Para establecer la relación con Examen y Pregunta, deberías tener métodos para obtenerlos desde la base de datos.
+                    // Aquí se asume que ya tienes implementados esos métodos en sus respectivos repositorios.
+                    ExamenRepository examenRepository = new ExamenRepository();
+                    examenPregunta.setExamen(examenRepository.obtenerExamenPorId(rs.getLong("examen_id")));
+                    PreguntaRepository preguntaRepository = new PreguntaRepository();
+                    examenPregunta.setPregunta(preguntaRepository.obtenerPreguntaPorId(rs.getLong("pregunta_id")));
+                    return examenPregunta;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<ExamenPregunta> obtenerTodasLasExamenPreguntas() throws SQLException {
+        List<ExamenPregunta> examenPreguntas = new ArrayList<>();
+        String sql = "SELECT * FROM examen_pregunta";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                ExamenPregunta examenPregunta = new ExamenPregunta();
+                examenPregunta.setId(rs.getLong("id"));
+                examenPregunta.setOrdenPregunta(rs.getInt("orden_pregunta"));
+                examenPregunta.setPuntajePregunta(rs.getFloat("puntaje_pregunta"));
+                // Para establecer la relación con Examen y Pregunta, deberías tener métodos para obtenerlos desde la base de datos.
+                // Aquí se asume que ya tienes implementados esos métodos en sus respectivos repositorios.
+                ExamenRepository examenRepository = new ExamenRepository();
+                examenPregunta.setExamen(examenRepository.obtenerExamenPorId(rs.getLong("examen_id")));
+                PreguntaRepository preguntaRepository = new PreguntaRepository();
+                examenPregunta.setPregunta(preguntaRepository.obtenerPreguntaPorId(rs.getLong("pregunta_id")));
+                examenPreguntas.add(examenPregunta);
+            }
+        }
+        return examenPreguntas;
+    }
+
+    public void actualizarExamenPregunta(ExamenPregunta examenPregunta) throws SQLException {
+        String sql = "UPDATE examen_pregunta SET orden_pregunta = ?, puntaje_pregunta = ?, examen_id = ?, pregunta_id = ? WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, examenPregunta.getOrdenPregunta());
+            stmt.setFloat(2, examenPregunta.getPuntajePregunta());
+            stmt.setLong(3, examenPregunta.getExamen().getId());
+            stmt.setLong(4, examenPregunta.getPregunta().getId());
+            stmt.setLong(5, examenPregunta.getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void eliminarExamenPregunta(Long id) throws SQLException {
+        String sql = "DELETE FROM examen_pregunta WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        }
+    }
+}

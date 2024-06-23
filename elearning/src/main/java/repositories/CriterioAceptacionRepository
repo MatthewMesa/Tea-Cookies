@@ -1,0 +1,81 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class CriterioAceptacionRepository {
+    private Connection conn;
+
+    public CriterioAceptacionRepository() throws SQLException {
+        this.conn = DatabaseConnection.getConnection();
+    }
+
+    public void closeConnection() throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+        }
+    }
+
+    public void crearCriterioAceptacion(CriterioAceptacion criterio) throws SQLException {
+        String sql = "INSERT INTO criterio_aceptacion (descripcion_criterio, nombre_criterio) VALUES (?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, criterio.getDescripcionCriterio());
+            stmt.setString(2, criterio.getNombreCriterio());
+            stmt.executeUpdate();
+        }
+    }
+
+    public CriterioAceptacion obtenerCriterioAceptacionPorId(Long id) throws SQLException {
+        String sql = "SELECT * FROM criterio_aceptacion WHERE cod_criterio_aceptacion = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new CriterioAceptacion(
+                            rs.getLong("cod_criterio_aceptacion"),
+                            rs.getString("descripcion_criterio"),
+                            rs.getString("nombre_criterio")
+                    );
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<CriterioAceptacion> obtenerTodosLosCriteriosAceptacion() throws SQLException {
+        List<CriterioAceptacion> criterios = new ArrayList<>();
+        String sql = "SELECT * FROM criterio_aceptacion";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                CriterioAceptacion criterio = new CriterioAceptacion(
+                        rs.getLong("cod_criterio_aceptacion"),
+                        rs.getString("descripcion_criterio"),
+                        rs.getString("nombre_criterio")
+                );
+                criterios.add(criterio);
+            }
+        }
+        return criterios;
+    }
+
+    public void actualizarCriterioAceptacion(CriterioAceptacion criterio) throws SQLException {
+        String sql = "UPDATE criterio_aceptacion SET descripcion_criterio = ?, nombre_criterio = ? WHERE cod_criterio_aceptacion = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, criterio.getDescripcionCriterio());
+            stmt.setString(2, criterio.getNombreCriterio());
+            stmt.setLong(3, criterio.getCodCriterioAceptacion());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void eliminarCriterioAceptacion(Long id) throws SQLException {
+        String sql = "DELETE FROM criterio_aceptacion WHERE cod_criterio_aceptacion = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        }
+    }
+}

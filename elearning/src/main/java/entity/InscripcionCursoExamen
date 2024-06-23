@@ -1,0 +1,29 @@
+package com.elearning.entity;
+
+import lombok.Data;
+import javax.persistence.*;
+import java.util.Date;
+import java.util.List;
+
+@Entity
+@Data
+public class InscripcionCursoExamen {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private float calificacionExamen;
+    private Date fechaHoraFinRendir;
+    private Date fechaHoraInicioRendir;
+
+    @ManyToOne
+    @JoinColumn(name = "inscripcionCurso_id")
+    private InscripcionCurso inscripcionCurso;
+
+    @ManyToOne
+    @JoinColumn(name = "examen_id")
+    private Examen examen;
+
+    @OneToMany(mappedBy = "inscripcionCursoExamen")
+    private List<InscripcionCursoExamenPregunta> preguntas;
+}

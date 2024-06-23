@@ -1,0 +1,17 @@
+package com.elearning.entity;
+
+import lombok.Data;
+import javax.persistence.*;
+import java.util.Date;
+
+@Entity
+@Data
+public class Ejercicio {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long codEjercicio;
+
+    private Date fechaHoraFinVigenciaEjercicio;
+    private String linkEjercicio;
+    private String nombreEjercicio;
+}

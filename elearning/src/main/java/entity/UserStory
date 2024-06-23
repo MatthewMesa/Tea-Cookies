@@ -1,0 +1,24 @@
+package com.elearning.entity;
+
+import lombok.Data;
+import javax.persistence.*;
+import java.util.Date;
+
+@Entity
+@Data
+public class UserStory {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private float cantidadHorasSprints;
+    private float costoUS;
+    private String descripcionUS;
+    private Date fechaHoraFinVigenciaUS;
+    private String modalidadUS;
+    private int storyPoints;
+
+    @ManyToOne
+    @JoinColumn(name = "epic_id")
+    private Epic epic;
+}

@@ -1,0 +1,24 @@
+package com.elearning.entity;
+
+import lombok.Data;
+import javax.persistence.*;
+
+@Entity
+@Data
+public class CursoExamen {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private float ponderacionExamen;
+    private Time tiempoResolucion;
+    private String unidadCurso;
+
+    @ManyToOne
+    @JoinColumn(name = "curso_id")
+    private Curso curso;
+
+    @ManyToOne
+    @JoinColumn(name = "examen_id")
+    private Examen examen;
+}

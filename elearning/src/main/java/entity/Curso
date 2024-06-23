@@ -1,0 +1,24 @@
+package com.elearning.entity;
+
+import lombok.Data;
+import javax.persistence.*;
+import java.util.Date;
+import java.util.List;
+
+@Entity
+@Data
+public class Curso {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long codCurso;
+
+    private String descripcionCurso;
+    private Date fechaFinCurso;
+    private Date fechaInicioCurso;
+    private String nombreCurso;
+    private String planEstudio;
+    private int porcentajeAprobacion;
+
+    @OneToMany(mappedBy = "curso")
+    private List<InscripcionCurso> inscripciones;
+}

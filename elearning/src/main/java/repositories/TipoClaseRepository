@@ -1,0 +1,81 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class TipoClaseRepository {
+    private Connection conn;
+
+    public TipoClaseRepository() throws SQLException {
+        this.conn = DatabaseConnection.getConnection();
+    }
+
+    public void closeConnection() throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+        }
+    }
+
+    public void crearTipoClase(TipoClase tipoClase) throws SQLException {
+        String sql = "INSERT INTO tipo_clase (nombreTipoClase, fechaHoraFinVigenciaTipoClase) VALUES (?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, tipoClase.getNombreTipoClase());
+            stmt.setTimestamp(2, new java.sql.Timestamp(tipoClase.getFechaHoraFinVigenciaTipoClase().getTime()));
+            stmt.executeUpdate();
+        }
+    }
+
+    public TipoClase obtenerTipoClasePorId(Long id) throws SQLException {
+        String sql = "SELECT * FROM tipo_clase WHERE codTipoClase = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    TipoClase tipoClase = new TipoClase();
+                    tipoClase.setCodTipoClase(rs.getLong("codTipoClase"));
+                    tipoClase.setNombreTipoClase(rs.getString("nombreTipoClase"));
+                    tipoClase.setFechaHoraFinVigenciaTipoClase(new Date(rs.getTimestamp("fechaHoraFinVigenciaTipoClase").getTime()));
+                    return tipoClase;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<TipoClase> obtenerTodosLosTiposClase() throws SQLException {
+        List<TipoClase> tiposClase = new ArrayList<>();
+        String sql = "SELECT * FROM tipo_clase";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                TipoClase tipoClase = new TipoClase();
+                tipoClase.setCodTipoClase(rs.getLong("codTipoClase"));
+                tipoClase.setNombreTipoClase(rs.getString("nombreTipoClase"));
+                tipoClase.setFechaHoraFinVigenciaTipoClase(new Date(rs.getTimestamp("fechaHoraFinVigenciaTipoClase").getTime()));
+                tiposClase.add(tipoClase);
+            }
+        }
+        return tiposClase;
+    }
+
+    public void actualizarTipoClase(TipoClase tipoClase) throws SQLException {
+        String sql = "UPDATE tipo_clase SET nombreTipoClase = ?, fechaHoraFinVigenciaTipoClase = ? WHERE codTipoClase = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, tipoClase.getNombreTipoClase());
+            stmt.setTimestamp(2, new java.sql.Timestamp(tipoClase.getFechaHoraFinVigenciaTipoClase().getTime()));
+            stmt.setLong(3, tipoClase.getCodTipoClase());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void eliminarTipoClase(Long id) throws SQLException {
+        String sql = "DELETE FROM tipo_clase WHERE codTipoClase = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        }
+    }
+}

@@ -1,0 +1,21 @@
+package com.elearning.entity;
+
+import lombok.Data;
+import javax.persistence.*;
+import java.util.Date;
+
+@Entity
+@Data
+public class Opcion {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long codOpcion;
+
+    private boolean correcta;
+    private String descripcionOpcion;
+    private Date fechaHoraFinVigenciaOpcion;
+
+    @ManyToOne
+    @JoinColumn(name = "pregunta_id")
+    private Pregunta pregunta;
+}

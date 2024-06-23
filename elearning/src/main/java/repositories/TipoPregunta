@@ -1,0 +1,81 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class TipoPreguntaRepository {
+    private Connection conn;
+
+    public TipoPreguntaRepository() throws SQLException {
+        this.conn = DatabaseConnection.getConnection();
+    }
+
+    public void closeConnection() throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+        }
+    }
+
+    public void crearTipoPregunta(TipoPregunta tipoPregunta) throws SQLException {
+        String sql = "INSERT INTO tipo_pregunta (nombreTipoPregunta, fechaHoraFinVigenciaTipoPregunta) VALUES (?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, tipoPregunta.getNombreTipoPregunta());
+            stmt.setTimestamp(2, new java.sql.Timestamp(tipoPregunta.getFechaHoraFinVigenciaTipoPregunta().getTime()));
+            stmt.executeUpdate();
+        }
+    }
+
+    public TipoPregunta obtenerTipoPreguntaPorId(Long id) throws SQLException {
+        String sql = "SELECT * FROM tipo_pregunta WHERE codTipoPregunta = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    TipoPregunta tipoPregunta = new TipoPregunta();
+                    tipoPregunta.setCodTipoPregunta(rs.getLong("codTipoPregunta"));
+                    tipoPregunta.setNombreTipoPregunta(rs.getString("nombreTipoPregunta"));
+                    tipoPregunta.setFechaHoraFinVigenciaTipoPregunta(new Date(rs.getTimestamp("fechaHoraFinVigenciaTipoPregunta").getTime()));
+                    return tipoPregunta;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<TipoPregunta> obtenerTodosLosTiposPregunta() throws SQLException {
+        List<TipoPregunta> tiposPregunta = new ArrayList<>();
+        String sql = "SELECT * FROM tipo_pregunta";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                TipoPregunta tipoPregunta = new TipoPregunta();
+                tipoPregunta.setCodTipoPregunta(rs.getLong("codTipoPregunta"));
+                tipoPregunta.setNombreTipoPregunta(rs.getString("nombreTipoPregunta"));
+                tipoPregunta.setFechaHoraFinVigenciaTipoPregunta(new Date(rs.getTimestamp("fechaHoraFinVigenciaTipoPregunta").getTime()));
+                tiposPregunta.add(tipoPregunta);
+            }
+        }
+        return tiposPregunta;
+    }
+
+    public void actualizarTipoPregunta(TipoPregunta tipoPregunta) throws SQLException {
+        String sql = "UPDATE tipo_pregunta SET nombreTipoPregunta = ?, fechaHoraFinVigenciaTipoPregunta = ? WHERE codTipoPregunta = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, tipoPregunta.getNombreTipoPregunta());
+            stmt.setTimestamp(2, new java.sql.Timestamp(tipoPregunta.getFechaHoraFinVigenciaTipoPregunta().getTime()));
+            stmt.setLong(3, tipoPregunta.getCodTipoPregunta());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void eliminarTipoPregunta(Long id) throws SQLException {
+        String sql = "DELETE FROM tipo_pregunta WHERE codTipoPregunta = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        }
+    }
+}

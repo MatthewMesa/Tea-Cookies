@@ -1,0 +1,96 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class InscripcionCursoExamenPreguntaRepository {
+    private Connection conn;
+
+    public InscripcionCursoExamenPreguntaRepository() throws SQLException {
+        this.conn = DatabaseConnection.getConnection();
+    }
+
+    public void closeConnection() throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+        }
+    }
+
+    public void crearInscripcionCursoExamenPregunta(InscripcionCursoExamenPregunta inscripcionCursoExamenPregunta) throws SQLException {
+        String sql = "INSERT INTO inscripcion_curso_examen_pregunta (desarrollo, puntaje_obtenido, inscripcionCursoExamen_id, pregunta_id) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, inscripcionCursoExamenPregunta.getDesarrollo());
+            stmt.setFloat(2, inscripcionCursoExamenPregunta.getPuntajeObtenido());
+            stmt.setLong(3, inscripcionCursoExamenPregunta.getInscripcionCursoExamen().getId());
+            stmt.setLong(4, inscripcionCursoExamenPregunta.getPregunta().getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    public InscripcionCursoExamenPregunta obtenerInscripcionCursoExamenPreguntaPorId(Long id) throws SQLException {
+        String sql = "SELECT * FROM inscripcion_curso_examen_pregunta WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    InscripcionCursoExamenPregunta inscripcionCursoExamenPregunta = new InscripcionCursoExamenPregunta();
+                    inscripcionCursoExamenPregunta.setId(rs.getLong("id"));
+                    inscripcionCursoExamenPregunta.setDesarrollo(rs.getString("desarrollo"));
+                    inscripcionCursoExamenPregunta.setPuntajeObtenido(rs.getFloat("puntaje_obtenido"));
+                    // Para establecer la relación con InscripcionCursoExamen y Pregunta, deberías tener métodos para obtenerlos desde la base de datos.
+                    // Aquí se asume que ya tienes implementados esos métodos en sus respectivos repositorios.
+                    InscripcionCursoExamenRepository inscripcionCursoExamenRepository = new InscripcionCursoExamenRepository();
+                    inscripcionCursoExamenPregunta.setInscripcionCursoExamen(inscripcionCursoExamenRepository.obtenerInscripcionCursoExamenPorId(rs.getLong("inscripcionCursoExamen_id")));
+                    PreguntaRepository preguntaRepository = new PreguntaRepository();
+                    inscripcionCursoExamenPregunta.setPregunta(preguntaRepository.obtenerPreguntaPorId(rs.getLong("pregunta_id")));
+                    return inscripcionCursoExamenPregunta;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<InscripcionCursoExamenPregunta> obtenerTodasLasInscripcionesCursoExamenPregunta() throws SQLException {
+        List<InscripcionCursoExamenPregunta> inscripcionesCursoExamenPregunta = new ArrayList<>();
+        String sql = "SELECT * FROM inscripcion_curso_examen_pregunta";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                InscripcionCursoExamenPregunta inscripcionCursoExamenPregunta = new InscripcionCursoExamenPregunta();
+                inscripcionCursoExamenPregunta.setId(rs.getLong("id"));
+                inscripcionCursoExamenPregunta.setDesarrollo(rs.getString("desarrollo"));
+                inscripcionCursoExamenPregunta.setPuntajeObtenido(rs.getFloat("puntaje_obtenido"));
+                // Para establecer la relación con InscripcionCursoExamen y Pregunta, deberías tener métodos para obtenerlos desde la base de datos.
+                // Aquí se asume que ya tienes implementados esos métodos en sus respectivos repositorios.
+                InscripcionCursoExamenRepository inscripcionCursoExamenRepository = new InscripcionCursoExamenRepository();
+                inscripcionCursoExamenPregunta.setInscripcionCursoExamen(inscripcionCursoExamenRepository.obtenerInscripcionCursoExamenPorId(rs.getLong("inscripcionCursoExamen_id")));
+                PreguntaRepository preguntaRepository = new PreguntaRepository();
+                inscripcionCursoExamenPregunta.setPregunta(preguntaRepository.obtenerPreguntaPorId(rs.getLong("pregunta_id")));
+                inscripcionesCursoExamenPregunta.add(inscripcionCursoExamenPregunta);
+            }
+        }
+        return inscripcionesCursoExamenPregunta;
+    }
+
+    public void actualizarInscripcionCursoExamenPregunta(InscripcionCursoExamenPregunta inscripcionCursoExamenPregunta) throws SQLException {
+        String sql = "UPDATE inscripcion_curso_examen_pregunta SET desarrollo = ?, puntaje_obtenido = ?, inscripcionCursoExamen_id = ?, pregunta_id = ? WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, inscripcionCursoExamenPregunta.getDesarrollo());
+            stmt.setFloat(2, inscripcionCursoExamenPregunta.getPuntajeObtenido());
+            stmt.setLong(3, inscripcionCursoExamenPregunta.getInscripcionCursoExamen().getId());
+            stmt.setLong(4, inscripcionCursoExamenPregunta.getPregunta().getId());
+            stmt.setLong(5, inscripcionCursoExamenPregunta.getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void eliminarInscripcionCursoExamenPregunta(Long id) throws SQLException {
+        String sql = "DELETE FROM inscripcion_curso_examen_pregunta WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        }
+    }
+}

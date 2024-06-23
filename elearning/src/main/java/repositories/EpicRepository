@@ -1,0 +1,82 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class EpicRepository {
+    private Connection conn;
+
+    public EpicRepository() throws SQLException {
+        this.conn = DatabaseConnection.getConnection();
+    }
+
+    public void closeConnection() throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+        }
+    }
+
+    public void crearEpic(Epic epic) throws SQLException {
+        String sql = "INSERT INTO epic (nombre_epic, fecha_hora_fin_vigencia_epic) VALUES (?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, epic.getNombreEpic());
+            stmt.setTimestamp(2, new java.sql.Timestamp(epic.getFechaHoraFinVigenciaEpic().getTime()));
+            stmt.executeUpdate();
+        }
+    }
+
+    public Epic obtenerEpicPorId(Long id) throws SQLException {
+        String sql = "SELECT * FROM epic WHERE cod_epic = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Epic(
+                            rs.getLong("cod_epic"),
+                            rs.getString("nombre_epic"),
+                            new Date(rs.getTimestamp("fecha_hora_fin_vigencia_epic").getTime())
+                    );
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<Epic> obtenerTodosLosEpics() throws SQLException {
+        List<Epic> epics = new ArrayList<>();
+        String sql = "SELECT * FROM epic";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Epic epic = new Epic(
+                        rs.getLong("cod_epic"),
+                        rs.getString("nombre_epic"),
+                        new Date(rs.getTimestamp("fecha_hora_fin_vigencia_epic").getTime())
+                );
+                epics.add(epic);
+            }
+        }
+        return epics;
+    }
+
+    public void actualizarEpic(Epic epic) throws SQLException {
+        String sql = "UPDATE epic SET nombre_epic = ?, fecha_hora_fin_vigencia_epic = ? WHERE cod_epic = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, epic.getNombreEpic());
+            stmt.setTimestamp(2, new java.sql.Timestamp(epic.getFechaHoraFinVigenciaEpic().getTime()));
+            stmt.setLong(3, epic.getCodEpic());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void eliminarEpic(Long id) throws SQLException {
+        String sql = "DELETE FROM epic WHERE cod_epic = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        }
+    }
+}

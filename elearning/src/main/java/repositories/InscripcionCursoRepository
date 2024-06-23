@@ -1,0 +1,96 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class InscripcionCursoRepository {
+    private Connection conn;
+
+    public InscripcionCursoRepository() throws SQLException {
+        this.conn = DatabaseConnection.getConnection();
+    }
+
+    public void closeConnection() throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+        }
+    }
+
+    public void crearInscripcionCurso(InscripcionCurso inscripcionCurso) throws SQLException {
+        String sql = "INSERT INTO inscripcion_curso (calificacion_final, numero_inscripcion, usuario_id, curso_id) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setFloat(1, inscripcionCurso.getCalificacionFinal());
+            stmt.setInt(2, inscripcionCurso.getNumeroInscripcion());
+            stmt.setLong(3, inscripcionCurso.getUsuario().getId());
+            stmt.setLong(4, inscripcionCurso.getCurso().getCodCurso());
+            stmt.executeUpdate();
+        }
+    }
+
+    public InscripcionCurso obtenerInscripcionCursoPorId(Long id) throws SQLException {
+        String sql = "SELECT * FROM inscripcion_curso WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    InscripcionCurso inscripcionCurso = new InscripcionCurso();
+                    inscripcionCurso.setId(rs.getLong("id"));
+                    inscripcionCurso.setCalificacionFinal(rs.getFloat("calificacion_final"));
+                    inscripcionCurso.setNumeroInscripcion(rs.getInt("numero_inscripcion"));
+                    // Para establecer la relación con Usuario y Curso, deberías tener métodos para obtenerlos desde la base de datos.
+                    // Aquí se asume que ya tienes implementados esos métodos en sus respectivos repositorios.
+                    UsuarioRepository usuarioRepository = new UsuarioRepository();
+                    inscripcionCurso.setUsuario(usuarioRepository.obtenerUsuarioPorId(rs.getLong("usuario_id")));
+                    CursoRepository cursoRepository = new CursoRepository();
+                    inscripcionCurso.setCurso(cursoRepository.obtenerCursoPorId(rs.getLong("curso_id")));
+                    return inscripcionCurso;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<InscripcionCurso> obtenerTodasLasInscripcionesCurso() throws SQLException {
+        List<InscripcionCurso> inscripcionesCurso = new ArrayList<>();
+        String sql = "SELECT * FROM inscripcion_curso";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                InscripcionCurso inscripcionCurso = new InscripcionCurso();
+                inscripcionCurso.setId(rs.getLong("id"));
+                inscripcionCurso.setCalificacionFinal(rs.getFloat("calificacion_final"));
+                inscripcionCurso.setNumeroInscripcion(rs.getInt("numero_inscripcion"));
+                // Para establecer la relación con Usuario y Curso, deberías tener métodos para obtenerlos desde la base de datos.
+                // Aquí se asume que ya tienes implementados esos métodos en sus respectivos repositorios.
+                UsuarioRepository usuarioRepository = new UsuarioRepository();
+                inscripcionCurso.setUsuario(usuarioRepository.obtenerUsuarioPorId(rs.getLong("usuario_id")));
+                CursoRepository cursoRepository = new CursoRepository();
+                inscripcionCurso.setCurso(cursoRepository.obtenerCursoPorId(rs.getLong("curso_id")));
+                inscripcionesCurso.add(inscripcionCurso);
+            }
+        }
+        return inscripcionesCurso;
+    }
+
+    public void actualizarInscripcionCurso(InscripcionCurso inscripcionCurso) throws SQLException {
+        String sql = "UPDATE inscripcion_curso SET calificacion_final = ?, numero_inscripcion = ?, usuario_id = ?, curso_id = ? WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setFloat(1, inscripcionCurso.getCalificacionFinal());
+            stmt.setInt(2, inscripcionCurso.getNumeroInscripcion());
+            stmt.setLong(3, inscripcionCurso.getUsuario().getId());
+            stmt.setLong(4, inscripcionCurso.getCurso().getCodCurso());
+            stmt.setLong(5, inscripcionCurso.getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void eliminarInscripcionCurso(Long id) throws SQLException {
+        String sql = "DELETE FROM inscripcion_curso WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        }
+    }
+}

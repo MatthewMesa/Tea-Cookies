@@ -1,0 +1,16 @@
+package com.elearning.entity;
+
+import lombok.Data;
+import javax.persistence.*;
+import java.util.Date;
+
+@Entity
+@Data
+public class TipoClase {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long codTipoClase;
+
+    private String nombreTipoClase;
+    private Date fechaHoraFinVigenciaTipoClase;
+}

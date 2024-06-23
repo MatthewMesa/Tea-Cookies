@@ -1,0 +1,23 @@
+package com.elearning.entity;
+
+import lombok.Data;
+import javax.persistence.*;
+
+@Entity
+@Data
+public class ExamenPregunta {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private int ordenPregunta;
+    private float puntajePregunta;
+
+    @ManyToOne
+    @JoinColumn(name = "examen_id")
+    private Examen examen;
+
+    @ManyToOne
+    @JoinColumn(name = "pregunta_id")
+    private Pregunta pregunta;
+}

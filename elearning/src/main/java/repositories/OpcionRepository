@@ -1,0 +1,95 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class OpcionRepository {
+    private Connection conn;
+
+    public OpcionRepository() throws SQLException {
+        this.conn = DatabaseConnection.getConnection();
+    }
+
+    public void closeConnection() throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+        }
+    }
+
+    public void crearOpcion(Opcion opcion) throws SQLException {
+        String sql = "INSERT INTO opcion (correcta, descripcionOpcion, fechaHoraFinVigenciaOpcion, pregunta_id) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setBoolean(1, opcion.isCorrecta());
+            stmt.setString(2, opcion.getDescripcionOpcion());
+            stmt.setTimestamp(3, new java.sql.Timestamp(opcion.getFechaHoraFinVigenciaOpcion().getTime()));
+            stmt.setLong(4, opcion.getPregunta().getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    public Opcion obtenerOpcionPorId(Long id) throws SQLException {
+        String sql = "SELECT * FROM opcion WHERE codOpcion = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Opcion opcion = new Opcion();
+                    opcion.setCodOpcion(rs.getLong("codOpcion"));
+                    opcion.setCorrecta(rs.getBoolean("correcta"));
+                    opcion.setDescripcionOpcion(rs.getString("descripcionOpcion"));
+                    opcion.setFechaHoraFinVigenciaOpcion(new Date(rs.getTimestamp("fechaHoraFinVigenciaOpcion").getTime()));
+                    // Aquí deberías tener un método para obtener la pregunta desde su repositorio correspondiente
+                    // Aquí se asume que ya tienes implementado ese método en el repositorio de Pregunta
+                    PreguntaRepository preguntaRepository = new PreguntaRepository();
+                    opcion.setPregunta(preguntaRepository.obtenerPreguntaPorId(rs.getLong("pregunta_id")));
+                    return opcion;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<Opcion> obtenerTodasLasOpciones() throws SQLException {
+        List<Opcion> opciones = new ArrayList<>();
+        String sql = "SELECT * FROM opcion";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Opcion opcion = new Opcion();
+                opcion.setCodOpcion(rs.getLong("codOpcion"));
+                opcion.setCorrecta(rs.getBoolean("correcta"));
+                opcion.setDescripcionOpcion(rs.getString("descripcionOpcion"));
+                opcion.setFechaHoraFinVigenciaOpcion(new Date(rs.getTimestamp("fechaHoraFinVigenciaOpcion").getTime()));
+                // Aquí deberías tener un método para obtener la pregunta desde su repositorio correspondiente
+                // Aquí se asume que ya tienes implementado ese método en el repositorio de Pregunta
+                PreguntaRepository preguntaRepository = new PreguntaRepository();
+                opcion.setPregunta(preguntaRepository.obtenerPreguntaPorId(rs.getLong("pregunta_id")));
+                opciones.add(opcion);
+            }
+        }
+        return opciones;
+    }
+
+    public void actualizarOpcion(Opcion opcion) throws SQLException {
+        String sql = "UPDATE opcion SET correcta = ?, descripcionOpcion = ?, fechaHoraFinVigenciaOpcion = ?, pregunta_id = ? WHERE codOpcion = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setBoolean(1, opcion.isCorrecta());
+            stmt.setString(2, opcion.getDescripcionOpcion());
+            stmt.setTimestamp(3, new java.sql.Timestamp(opcion.getFechaHoraFinVigenciaOpcion().getTime()));
+            stmt.setLong(4, opcion.getPregunta().getId());
+            stmt.setLong(5, opcion.getCodOpcion());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void eliminarOpcion(Long id) throws SQLException {
+        String sql = "DELETE FROM opcion WHERE codOpcion = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        }
+    }
+}

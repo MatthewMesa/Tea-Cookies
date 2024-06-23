@@ -1,0 +1,85 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class AsistenciaRepository {
+    private Connection conn;
+
+    public AsistenciaRepository() throws SQLException {
+        this.conn = DatabaseConnection.getConnection();
+    }
+
+    public void closeConnection() throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+        }
+    }
+
+    public void crearAsistencia(Asistencia asistencia) throws SQLException {
+        String sql = "INSERT INTO asistencia (asistencia_clase, clase_id, usuario_id) VALUES (?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setBoolean(1, asistencia.isAsistenciaClase());
+            stmt.setLong(2, asistencia.getClase().getId());
+            stmt.setLong(3, asistencia.getUsuario().getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    public Asistencia obtenerAsistenciaPorId(Long id) throws SQLException {
+        String sql = "SELECT * FROM asistencia WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Asistencia(
+                            rs.getLong("id"),
+                            rs.getBoolean("asistencia_clase"),
+                            new Clase(rs.getLong("clase_id")), // Suponiendo que tienes un constructor en Clase para el ID
+                            new Usuario(rs.getLong("usuario_id")) // Suponiendo que tienes un constructor en Usuario para el ID
+                    );
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<Asistencia> obtenerTodasLasAsistencias() throws SQLException {
+        List<Asistencia> asistencias = new ArrayList<>();
+        String sql = "SELECT * FROM asistencia";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Asistencia asistencia = new Asistencia(
+                        rs.getLong("id"),
+                        rs.getBoolean("asistencia_clase"),
+                        new Clase(rs.getLong("clase_id")), // Suponiendo que tienes un constructor en Clase para el ID
+                        new Usuario(rs.getLong("usuario_id")) // Suponiendo que tienes un constructor en Usuario para el ID
+                );
+                asistencias.add(asistencia);
+            }
+        }
+        return asistencias;
+    }
+
+    public void actualizarAsistencia(Asistencia asistencia) throws SQLException {
+        String sql = "UPDATE asistencia SET asistencia_clase = ?, clase_id = ?, usuario_id = ? WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setBoolean(1, asistencia.isAsistenciaClase());
+            stmt.setLong(2, asistencia.getClase().getId());
+            stmt.setLong(3, asistencia.getUsuario().getId());
+            stmt.setLong(4, asistencia.getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void eliminarAsistencia(Long id) throws SQLException {
+        String sql = "DELETE FROM asistencia WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        }
+    }
+}

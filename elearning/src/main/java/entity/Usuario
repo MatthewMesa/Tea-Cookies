@@ -1,0 +1,21 @@
+package com.elearning.entity;
+
+import lombok.Data;
+import javax.persistence.*;
+import java.util.Date;
+
+@Entity
+@Data
+public class Usuario {
+    @Id
+    private Long cuilUsuario;
+
+    private String correoUsuario;
+    private Date fechaNacimientoUsuario;
+    private String nombreUsuario;
+    private String razonSocialUsuario;
+
+    @ManyToOne
+    @JoinColumn(name = "tipoUsuario_id")
+    private TipoUsuario tipoUsuario;
+}

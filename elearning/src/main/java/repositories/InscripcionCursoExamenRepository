@@ -1,0 +1,101 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class InscripcionCursoExamenRepository {
+    private Connection conn;
+
+    public InscripcionCursoExamenRepository() throws SQLException {
+        this.conn = DatabaseConnection.getConnection();
+    }
+
+    public void closeConnection() throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+        }
+    }
+
+    public void crearInscripcionCursoExamen(InscripcionCursoExamen inscripcionCursoExamen) throws SQLException {
+        String sql = "INSERT INTO inscripcion_curso_examen (calificacion_examen, fecha_hora_fin_rendir, fecha_hora_inicio_rendir, inscripcionCurso_id, examen_id) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setFloat(1, inscripcionCursoExamen.getCalificacionExamen());
+            stmt.setTimestamp(2, new java.sql.Timestamp(inscripcionCursoExamen.getFechaHoraFinRendir().getTime()));
+            stmt.setTimestamp(3, new java.sql.Timestamp(inscripcionCursoExamen.getFechaHoraInicioRendir().getTime()));
+            stmt.setLong(4, inscripcionCursoExamen.getInscripcionCurso().getId());
+            stmt.setLong(5, inscripcionCursoExamen.getExamen().getCodExamen());
+            stmt.executeUpdate();
+        }
+    }
+
+    public InscripcionCursoExamen obtenerInscripcionCursoExamenPorId(Long id) throws SQLException {
+        String sql = "SELECT * FROM inscripcion_curso_examen WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    InscripcionCursoExamen inscripcionCursoExamen = new InscripcionCursoExamen();
+                    inscripcionCursoExamen.setId(rs.getLong("id"));
+                    inscripcionCursoExamen.setCalificacionExamen(rs.getFloat("calificacion_examen"));
+                    inscripcionCursoExamen.setFechaHoraFinRendir(new Date(rs.getTimestamp("fecha_hora_fin_rendir").getTime()));
+                    inscripcionCursoExamen.setFechaHoraInicioRendir(new Date(rs.getTimestamp("fecha_hora_inicio_rendir").getTime()));
+                    // Para establecer la relación con InscripcionCurso y Examen, deberías tener métodos para obtenerlos desde la base de datos.
+                    // Aquí se asume que ya tienes implementados esos métodos en sus respectivos repositorios.
+                    InscripcionCursoRepository inscripcionCursoRepository = new InscripcionCursoRepository();
+                    inscripcionCursoExamen.setInscripcionCurso(inscripcionCursoRepository.obtenerInscripcionCursoPorId(rs.getLong("inscripcionCurso_id")));
+                    ExamenRepository examenRepository = new ExamenRepository();
+                    inscripcionCursoExamen.setExamen(examenRepository.obtenerExamenPorId(rs.getLong("examen_id")));
+                    return inscripcionCursoExamen;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<InscripcionCursoExamen> obtenerTodasLasInscripcionesCursoExamen() throws SQLException {
+        List<InscripcionCursoExamen> inscripcionesCursoExamen = new ArrayList<>();
+        String sql = "SELECT * FROM inscripcion_curso_examen";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                InscripcionCursoExamen inscripcionCursoExamen = new InscripcionCursoExamen();
+                inscripcionCursoExamen.setId(rs.getLong("id"));
+                inscripcionCursoExamen.setCalificacionExamen(rs.getFloat("calificacion_examen"));
+                inscripcionCursoExamen.setFechaHoraFinRendir(new Date(rs.getTimestamp("fecha_hora_fin_rendir").getTime()));
+                inscripcionCursoExamen.setFechaHoraInicioRendir(new Date(rs.getTimestamp("fecha_hora_inicio_rendir").getTime()));
+                // Para establecer la relación con InscripcionCurso y Examen, deberías tener métodos para obtenerlos desde la base de datos.
+                // Aquí se asume que ya tienes implementados esos métodos en sus respectivos repositorios.
+                InscripcionCursoRepository inscripcionCursoRepository = new InscripcionCursoRepository();
+                inscripcionCursoExamen.setInscripcionCurso(inscripcionCursoRepository.obtenerInscripcionCursoPorId(rs.getLong("inscripcionCurso_id")));
+                ExamenRepository examenRepository = new ExamenRepository();
+                inscripcionCursoExamen.setExamen(examenRepository.obtenerExamenPorId(rs.getLong("examen_id")));
+                inscripcionesCursoExamen.add(inscripcionCursoExamen);
+            }
+        }
+        return inscripcionesCursoExamen;
+    }
+
+    public void actualizarInscripcionCursoExamen(InscripcionCursoExamen inscripcionCursoExamen) throws SQLException {
+        String sql = "UPDATE inscripcion_curso_examen SET calificacion_examen = ?, fecha_hora_fin_rendir = ?, fecha_hora_inicio_rendir = ?, inscripcionCurso_id = ?, examen_id = ? WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setFloat(1, inscripcionCursoExamen.getCalificacionExamen());
+            stmt.setTimestamp(2, new java.sql.Timestamp(inscripcionCursoExamen.getFechaHoraFinRendir().getTime()));
+            stmt.setTimestamp(3, new java.sql.Timestamp(inscripcionCursoExamen.getFechaHoraInicioRendir().getTime()));
+            stmt.setLong(4, inscripcionCursoExamen.getInscripcionCurso().getId());
+            stmt.setLong(5, inscripcionCursoExamen.getExamen().getCodExamen());
+            stmt.setLong(6, inscripcionCursoExamen.getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void eliminarInscripcionCursoExamen(Long id) throws SQLException {
+        String sql = "DELETE FROM inscripcion_curso_examen WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        }
+    }
+}

@@ -1,0 +1,82 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class ExamenRepository {
+    private Connection conn;
+
+    public ExamenRepository() throws SQLException {
+        this.conn = DatabaseConnection.getConnection();
+    }
+
+    public void closeConnection() throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+        }
+    }
+
+    public void crearExamen(Examen examen) throws SQLException {
+        String sql = "INSERT INTO examen (descripcion_examen, fecha_hora_fin_vigencia_examen) VALUES (?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, examen.getDescripcionExamen());
+            stmt.setTimestamp(2, new java.sql.Timestamp(examen.getFechaHoraFinVigenciaExamen().getTime()));
+            stmt.executeUpdate();
+        }
+    }
+
+    public Examen obtenerExamenPorId(Long id) throws SQLException {
+        String sql = "SELECT * FROM examen WHERE cod_examen = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Examen(
+                            rs.getLong("cod_examen"),
+                            rs.getString("descripcion_examen"),
+                            new Date(rs.getTimestamp("fecha_hora_fin_vigencia_examen").getTime())
+                    );
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<Examen> obtenerTodosLosExamenes() throws SQLException {
+        List<Examen> examenes = new ArrayList<>();
+        String sql = "SELECT * FROM examen";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Examen examen = new Examen(
+                        rs.getLong("cod_examen"),
+                        rs.getString("descripcion_examen"),
+                        new Date(rs.getTimestamp("fecha_hora_fin_vigencia_examen").getTime())
+                );
+                examenes.add(examen);
+            }
+        }
+        return examenes;
+    }
+
+    public void actualizarExamen(Examen examen) throws SQLException {
+        String sql = "UPDATE examen SET descripcion_examen = ?, fecha_hora_fin_vigencia_examen = ? WHERE cod_examen = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, examen.getDescripcionExamen());
+            stmt.setTimestamp(2, new java.sql.Timestamp(examen.getFechaHoraFinVigenciaExamen().getTime()));
+            stmt.setLong(3, examen.getCodExamen());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void eliminarExamen(Long id) throws SQLException {
+        String sql = "DELETE FROM examen WHERE cod_examen = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        }
+    }
+}

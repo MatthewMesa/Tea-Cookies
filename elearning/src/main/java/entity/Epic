@@ -1,0 +1,20 @@
+package com.elearning.entity;
+
+import lombok.Data;
+import javax.persistence.*;
+import java.util.Date;
+import java.util.List;
+
+@Entity
+@Data
+public class Epic {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long codEpic;
+
+    private String nombreEpic;
+    private Date fechaHoraFinVigenciaEpic;
+
+    @OneToMany(mappedBy = "epic")
+    private List<UserStory> userStories;
+}

@@ -1,0 +1,22 @@
+package com.elearning.entity;
+
+import lombok.Data;
+import javax.persistence.*;
+
+@Entity
+@Data
+public class Asistencia {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private boolean asistenciaClase;
+
+    @ManyToOne
+    @JoinColumn(name = "clase_id")
+    private Clase clase;
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
+}

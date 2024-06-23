@@ -1,0 +1,94 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
+
+public class CursoExamenRepository {
+    private Connection conn;
+
+    public CursoExamenRepository() throws SQLException {
+        this.conn = DatabaseConnection.getConnection();
+    }
+
+    public void closeConnection() throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+        }
+    }
+
+    public void crearCursoExamen(CursoExamen cursoExamen) throws SQLException {
+        String sql = "INSERT INTO curso_examen (ponderacion_examen, tiempo_resolucion, unidad_curso, curso_id, examen_id) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setFloat(1, cursoExamen.getPonderacionExamen());
+            stmt.setTime(2, cursoExamen.getTiempoResolucion());
+            stmt.setString(3, cursoExamen.getUnidadCurso());
+            stmt.setLong(4, cursoExamen.getCurso().getCodCurso());
+            stmt.setLong(5, cursoExamen.getExamen().getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    public CursoExamen obtenerCursoExamenPorId(Long id) throws SQLException {
+        String sql = "SELECT * FROM curso_examen WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new CursoExamen(
+                            rs.getLong("id"),
+                            rs.getFloat("ponderacion_examen"),
+                            rs.getTime("tiempo_resolucion"),
+                            rs.getString("unidad_curso"),
+                            new Curso(rs.getLong("curso_id")), // Suponiendo que tienes un constructor en Curso para el ID
+                            new Examen(rs.getLong("examen_id")) // Suponiendo que tienes un constructor en Examen para el ID
+                    );
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<CursoExamen> obtenerTodosLosCursosExamenes() throws SQLException {
+        List<CursoExamen> cursoExamenes = new ArrayList<>();
+        String sql = "SELECT * FROM curso_examen";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                CursoExamen cursoExamen = new CursoExamen(
+                        rs.getLong("id"),
+                        rs.getFloat("ponderacion_examen"),
+                        rs.getTime("tiempo_resolucion"),
+                        rs.getString("unidad_curso"),
+                        new Curso(rs.getLong("curso_id")), // Suponiendo que tienes un constructor en Curso para el ID
+                        new Examen(rs.getLong("examen_id")) // Suponiendo que tienes un constructor en Examen para el ID
+                );
+                cursoExamenes.add(cursoExamen);
+            }
+        }
+        return cursoExamenes;
+    }
+
+    public void actualizarCursoExamen(CursoExamen cursoExamen) throws SQLException {
+        String sql = "UPDATE curso_examen SET ponderacion_examen = ?, tiempo_resolucion = ?, unidad_curso = ?, curso_id = ?, examen_id = ? WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setFloat(1, cursoExamen.getPonderacionExamen());
+            stmt.setTime(2, cursoExamen.getTiempoResolucion());
+            stmt.setString(3, cursoExamen.getUnidadCurso());
+            stmt.setLong(4, cursoExamen.getCurso().getCodCurso());
+            stmt.setLong(5, cursoExamen.getExamen().getId());
+            stmt.setLong(6, cursoExamen.getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void eliminarCursoExamen(Long id) throws SQLException {
+        String sql = "DELETE FROM curso_examen WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        }
+    }
+}

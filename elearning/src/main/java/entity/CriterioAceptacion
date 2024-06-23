@@ -1,0 +1,20 @@
+package com.elearning.entity;
+
+import lombok.Data;
+import javax.persistence.*;
+import java.util.List;
+
+@Entity
+@Data
+public class CriterioAceptacion {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long codCriterioAceptacion;
+
+    private String descripcionCriterio;
+    private String nombreCriterio;
+
+    @OneToMany(mappedBy = "criterioAceptacion")
+    private List<UserStory> userStories;
+
+}
