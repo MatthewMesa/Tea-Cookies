@@ -1,0 +1,48 @@
+package com.controller;
+
+import com.entity.Clase;
+import com.service.ClaseService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/clases")
+public class ClaseController {
+
+    @Autowired
+    private ClaseService claseService;
+
+    @PostMapping
+    public ResponseEntity<Clase> createClase(@RequestBody Clase clase) {
+        Clase createdClase = claseService.createClase(clase);
+        return ResponseEntity.ok(createdClase);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Clase> updateClase(@PathVariable int id, @RequestBody Clase clase) {
+        clase.setId(id); // Asume que la entidad Clase tiene un campo 'id'
+        Clase updatedClase = claseService.updateClase(clase);
+        return ResponseEntity.ok(updatedClase);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteClase(@PathVariable int id) {
+        claseService.deleteClase(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Clase> getClaseById(@PathVariable int id) {
+        Clase clase = claseService.getClaseById(id);
+        return ResponseEntity.ok(clase);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Clase>> getAllClases() {
+        List<Clase> clases = claseService.getAllClases();
+        return ResponseEntity.ok(clases);
+    }
+}

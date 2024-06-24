@@ -1,0 +1,48 @@
+package com.controller;
+
+import com.entity.ExamenEstudiante;
+import com.service.ExamenEstudianteService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/examenestudiantes")
+public class ExamenEstudianteController {
+
+    @Autowired
+    private ExamenEstudianteService examenEstudianteService;
+
+    @PostMapping
+    public ResponseEntity<ExamenEstudiante> createExamenEstudiante(@RequestBody ExamenEstudiante examenEstudiante) {
+        ExamenEstudiante createdExamenEstudiante = examenEstudianteService.createExamenEstudiante(examenEstudiante);
+        return ResponseEntity.ok(createdExamenEstudiante);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ExamenEstudiante> updateExamenEstudiante(@PathVariable int id, @RequestBody ExamenEstudiante examenEstudiante) {
+        examenEstudiante.setId(id); // Asume que la entidad ExamenEstudiante tiene un campo 'id'
+        ExamenEstudiante updatedExamenEstudiante = examenEstudianteService.updateExamenEstudiante(examenEstudiante);
+        return ResponseEntity.ok(updatedExamenEstudiante);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteExamenEstudiante(@PathVariable int id) {
+        examenEstudianteService.deleteExamenEstudiante(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ExamenEstudiante> getExamenEstudianteById(@PathVariable int id) {
+        ExamenEstudiante examenEstudiante = examenEstudianteService.getExamenEstudianteById(id);
+        return ResponseEntity.ok(examenEstudiante);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ExamenEstudiante>> getAllExamenEstudiantes() {
+        List<ExamenEstudiante> examenEstudiantes = examenEstudianteService.getAllExamenEstudiantes();
+        return ResponseEntity.ok(examenEstudiantes);
+    }
+}

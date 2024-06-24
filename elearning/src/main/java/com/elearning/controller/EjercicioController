@@ -1,0 +1,48 @@
+package com.controller;
+
+import com.entity.Ejercicio;
+import com.service.EjercicioService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/ejercicios")
+public class EjercicioController {
+
+    @Autowired
+    private EjercicioService ejercicioService;
+
+    @PostMapping
+    public ResponseEntity<Ejercicio> createEjercicio(@RequestBody Ejercicio ejercicio) {
+        Ejercicio createdEjercicio = ejercicioService.createEjercicio(ejercicio);
+        return ResponseEntity.ok(createdEjercicio);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Ejercicio> updateEjercicio(@PathVariable int id, @RequestBody Ejercicio ejercicio) {
+        ejercicio.setId(id); // Asume que la entidad Ejercicio tiene un campo 'id'
+        Ejercicio updatedEjercicio = ejercicioService.updateEjercicio(ejercicio);
+        return ResponseEntity.ok(updatedEjercicio);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEjercicio(@PathVariable int id) {
+        ejercicioService.deleteEjercicio(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Ejercicio> getEjercicioById(@PathVariable int id) {
+        Ejercicio ejercicio = ejercicioService.getEjercicioById(id);
+        return ResponseEntity.ok(ejercicio);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Ejercicio>> getAllEjercicios() {
+        List<Ejercicio> ejercicios = ejercicioService.getAllEjercicios();
+        return ResponseEntity.ok(ejercicios);
+    }
+}

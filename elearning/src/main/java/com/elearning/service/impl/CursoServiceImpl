@@ -1,0 +1,43 @@
+package com.service.impl;
+
+import com.entity.Curso;
+import com.repository.CursoRepository;
+import com.service.CursoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class CursoServiceImpl implements CursoService {
+
+    @Autowired
+    private CursoRepository cursoRepository;
+
+    @Override
+    public Curso createCurso(Curso curso) {
+        return cursoRepository.save(curso);
+    }
+
+    @Override
+    public Curso updateCurso(Curso curso) {
+        return cursoRepository.save(curso);
+    }
+
+    @Override
+    public void deleteCurso(int id) {
+        cursoRepository.deleteById(id);
+    }
+
+    @Override
+    public Curso getCursoById(int id) {
+        Optional<Curso> optionalCurso = cursoRepository.findById(id);
+        return optionalCurso.orElse(null);
+    }
+
+    @Override
+    public List<Curso> getAllCursos() {
+        return cursoRepository.findAll();
+    }
+}

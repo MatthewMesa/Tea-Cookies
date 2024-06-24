@@ -1,0 +1,43 @@
+package com.service.impl;
+
+import com.entity.CriterioAceptacion;
+import com.repository.CriterioAceptacionRepository;
+import com.service.CriterioAceptacionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class CriterioAceptacionServiceImpl implements CriterioAceptacionService {
+
+    @Autowired
+    private CriterioAceptacionRepository criterioAceptacionRepository;
+
+    @Override
+    public CriterioAceptacion createCriterioAceptacion(CriterioAceptacion criterioAceptacion) {
+        return criterioAceptacionRepository.save(criterioAceptacion);
+    }
+
+    @Override
+    public CriterioAceptacion updateCriterioAceptacion(CriterioAceptacion criterioAceptacion) {
+        return criterioAceptacionRepository.save(criterioAceptacion);
+    }
+
+    @Override
+    public void deleteCriterioAceptacion(int id) {
+        criterioAceptacionRepository.deleteById(id);
+    }
+
+    @Override
+    public CriterioAceptacion getCriterioAceptacionById(int id) {
+        Optional<CriterioAceptacion> optionalCriterioAceptacion = criterioAceptacionRepository.findById(id);
+        return optionalCriterioAceptacion.orElse(null);
+    }
+
+    @Override
+    public List<CriterioAceptacion> getAllCriteriosAceptacion() {
+        return criterioAceptacionRepository.findAll();
+    }
+}

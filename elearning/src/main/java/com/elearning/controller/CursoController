@@ -1,0 +1,48 @@
+package com.controller;
+
+import com.entity.Curso;
+import com.service.CursoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/cursos")
+public class CursoController {
+
+    @Autowired
+    private CursoService cursoService;
+
+    @PostMapping
+    public ResponseEntity<Curso> createCurso(@RequestBody Curso curso) {
+        Curso createdCurso = cursoService.createCurso(curso);
+        return ResponseEntity.ok(createdCurso);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Curso> updateCurso(@PathVariable int id, @RequestBody Curso curso) {
+        curso.setCodCurso(id);
+        Curso updatedCurso = cursoService.updateCurso(curso);
+        return ResponseEntity.ok(updatedCurso);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCurso(@PathVariable int id) {
+        cursoService.deleteCurso(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Curso> getCursoById(@PathVariable int id) {
+        Curso curso = cursoService.getCursoById(id);
+        return ResponseEntity.ok(curso);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Curso>> getAllCursos() {
+        List<Curso> cursos = cursoService.getAllCursos();
+        return ResponseEntity.ok(cursos);
+    }
+}

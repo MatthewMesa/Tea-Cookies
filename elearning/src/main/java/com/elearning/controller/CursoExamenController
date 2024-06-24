@@ -1,0 +1,48 @@
+package com.controller;
+
+import com.entity.CursoExamen;
+import com.service.CursoExamenService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/cursoexamenes")
+public class CursoExamenController {
+
+    @Autowired
+    private CursoExamenService cursoExamenService;
+
+    @PostMapping
+    public ResponseEntity<CursoExamen> createCursoExamen(@RequestBody CursoExamen cursoExamen) {
+        CursoExamen createdCursoExamen = cursoExamenService.createCursoExamen(cursoExamen);
+        return ResponseEntity.ok(createdCursoExamen);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CursoExamen> updateCursoExamen(@PathVariable int id, @RequestBody CursoExamen cursoExamen) {
+        cursoExamen.setId(id); // Asume que la entidad CursoExamen tiene un campo 'id'
+        CursoExamen updatedCursoExamen = cursoExamenService.updateCursoExamen(cursoExamen);
+        return ResponseEntity.ok(updatedCursoExamen);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCursoExamen(@PathVariable int id) {
+        cursoExamenService.deleteCursoExamen(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CursoExamen> getCursoExamenById(@PathVariable int id) {
+        CursoExamen cursoExamen = cursoExamenService.getCursoExamenById(id);
+        return ResponseEntity.ok(cursoExamen);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CursoExamen>> getAllCursoExamenes() {
+        List<CursoExamen> cursoExamenes = cursoExamenService.getAllCursoExamenes();
+        return ResponseEntity.ok(cursoExamenes);
+    }
+}

@@ -1,0 +1,48 @@
+package com.controller;
+
+import com.entity.Material;
+import com.service.MaterialService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/materiales")
+public class MaterialController {
+
+    @Autowired
+    private MaterialService materialService;
+
+    @PostMapping
+    public ResponseEntity<Material> createMaterial(@RequestBody Material material) {
+        Material createdMaterial = materialService.createMaterial(material);
+        return ResponseEntity.ok(createdMaterial);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Material> updateMaterial(@PathVariable int id, @RequestBody Material material) {
+        material.setId(id); // Asume que la entidad Material tiene un campo 'id'
+        Material updatedMaterial = materialService.updateMaterial(material);
+        return ResponseEntity.ok(updatedMaterial);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMaterial(@PathVariable int id) {
+        materialService.deleteMaterial(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Material> getMaterialById(@PathVariable int id) {
+        Material material = materialService.getMaterialById(id);
+        return ResponseEntity.ok(material);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Material>> getAllMateriales() {
+        List<Material> materiales = materialService.getAllMateriales();
+        return ResponseEntity.ok(materiales);
+    }
+}

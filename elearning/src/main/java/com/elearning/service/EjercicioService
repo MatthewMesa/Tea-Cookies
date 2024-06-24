@@ -1,0 +1,12 @@
+package com.service;
+
+import com.entity.Ejercicio;
+import java.util.List;
+
+public interface EjercicioService {
+    Ejercicio createEjercicio(Ejercicio ejercicio);
+    Ejercicio updateEjercicio(Ejercicio ejercicio);
+    void deleteEjercicio(int id);
+    Ejercicio getEjercicioById(int id);
+    List<Ejercicio> getAllEjercicios();
+}

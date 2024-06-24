@@ -1,0 +1,12 @@
+package com.service;
+
+import com.entity.EstadoInscripcionCurso;
+import java.util.List;
+
+public interface EstadoInscripcionCursoService {
+    EstadoInscripcionCurso createEstadoInscripcionCurso(EstadoInscripcionCurso estadoInscripcionCurso);
+    EstadoInscripcionCurso updateEstadoInscripcionCurso(EstadoInscripcionCurso estadoInscripcionCurso);
+    void deleteEstadoInscripcionCurso(int id);
+    EstadoInscripcionCurso getEstadoInscripcionCursoById(int id);
+    List<EstadoInscripcionCurso> getAllEstadosInscripcionCurso();
+}

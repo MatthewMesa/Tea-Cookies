@@ -1,0 +1,12 @@
+package com.service;
+
+import com.entity.Clase;
+import java.util.List;
+
+public interface ClaseService {
+    Clase createClase(Clase clase);
+    Clase updateClase(Clase clase);
+    void deleteClase(int id);
+    Clase getClaseById(int id);
+    List<Clase> getAllClases();
+}

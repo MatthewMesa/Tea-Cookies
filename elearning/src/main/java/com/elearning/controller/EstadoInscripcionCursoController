@@ -1,0 +1,48 @@
+package com.controller;
+
+import com.entity.EstadoInscripcionCurso;
+import com.service.EstadoInscripcionCursoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/estadosInscripcionCurso")
+public class EstadoInscripcionCursoController {
+
+    @Autowired
+    private EstadoInscripcionCursoService estadoInscripcionCursoService;
+
+    @PostMapping
+    public ResponseEntity<EstadoInscripcionCurso> createEstadoInscripcionCurso(@RequestBody EstadoInscripcionCurso estadoInscripcionCurso) {
+        EstadoInscripcionCurso createdEstadoInscripcionCurso = estadoInscripcionCursoService.createEstadoInscripcionCurso(estadoInscripcionCurso);
+        return ResponseEntity.ok(createdEstadoInscripcionCurso);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<EstadoInscripcionCurso> updateEstadoInscripcionCurso(@PathVariable int id, @RequestBody EstadoInscripcionCurso estadoInscripcionCurso) {
+        estadoInscripcionCurso.setId(id); // Asume que la entidad EstadoInscripcionCurso tiene un campo 'id'
+        EstadoInscripcionCurso updatedEstadoInscripcionCurso = estadoInscripcionCursoService.updateEstadoInscripcionCurso(estadoInscripcionCurso);
+        return ResponseEntity.ok(updatedEstadoInscripcionCurso);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEstadoInscripcionCurso(@PathVariable int id) {
+        estadoInscripcionCursoService.deleteEstadoInscripcionCurso(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<EstadoInscripcionCurso> getEstadoInscripcionCursoById(@PathVariable int id) {
+        EstadoInscripcionCurso estadoInscripcionCurso = estadoInscripcionCursoService.getEstadoInscripcionCursoById(id);
+        return ResponseEntity.ok(estadoInscripcionCurso);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<EstadoInscripcionCurso>> getAllEstadosInscripcionCurso() {
+        List<EstadoInscripcionCurso> estadosInscripcionCurso = estadoInscripcionCursoService.getAllEstadosInscripcionCurso();
+        return ResponseEntity.ok(estadosInscripcionCurso);
+    }
+}

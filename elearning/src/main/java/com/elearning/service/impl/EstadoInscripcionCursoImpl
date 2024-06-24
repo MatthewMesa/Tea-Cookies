@@ -1,0 +1,43 @@
+package com.service.impl;
+
+import com.entity.EstadoInscripcionCurso;
+import com.repository.EstadoInscripcionCursoRepository;
+import com.service.EstadoInscripcionCursoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class EstadoInscripcionCursoServiceImpl implements EstadoInscripcionCursoService {
+
+    @Autowired
+    private EstadoInscripcionCursoRepository estadoInscripcionCursoRepository;
+
+    @Override
+    public EstadoInscripcionCurso createEstadoInscripcionCurso(EstadoInscripcionCurso estadoInscripcionCurso) {
+        return estadoInscripcionCursoRepository.save(estadoInscripcionCurso);
+    }
+
+    @Override
+    public EstadoInscripcionCurso updateEstadoInscripcionCurso(EstadoInscripcionCurso estadoInscripcionCurso) {
+        return estadoInscripcionCursoRepository.save(estadoInscripcionCurso);
+    }
+
+    @Override
+    public void deleteEstadoInscripcionCurso(int id) {
+        estadoInscripcionCursoRepository.deleteById(id);
+    }
+
+    @Override
+    public EstadoInscripcionCurso getEstadoInscripcionCursoById(int id) {
+        Optional<EstadoInscripcionCurso> optionalEstadoInscripcionCurso = estadoInscripcionCursoRepository.findById(id);
+        return optionalEstadoInscripcionCurso.orElse(null);
+    }
+
+    @Override
+    public List<EstadoInscripcionCurso> getAllEstadosInscripcionCurso() {
+        return estadoInscripcionCursoRepository.findAll();
+    }
+}

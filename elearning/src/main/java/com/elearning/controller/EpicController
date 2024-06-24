@@ -1,0 +1,48 @@
+package com.controller;
+
+import com.entity.Epic;
+import com.service.EpicService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/epics")
+public class EpicController {
+
+    @Autowired
+    private EpicService epicService;
+
+    @PostMapping
+    public ResponseEntity<Epic> createEpic(@RequestBody Epic epic) {
+        Epic createdEpic = epicService.createEpic(epic);
+        return ResponseEntity.ok(createdEpic);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Epic> updateEpic(@PathVariable int id, @RequestBody Epic epic) {
+        epic.setId(id); // Asume que la entidad Epic tiene un campo 'id'
+        Epic updatedEpic = epicService.updateEpic(epic);
+        return ResponseEntity.ok(updatedEpic);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEpic(@PathVariable int id) {
+        epicService.deleteEpic(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Epic> getEpicById(@PathVariable int id) {
+        Epic epic = epicService.getEpicById(id);
+        return ResponseEntity.ok(epic);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Epic>> getAllEpics() {
+        List<Epic> epics = epicService.getAllEpics();
+        return ResponseEntity.ok(epics);
+    }
+}

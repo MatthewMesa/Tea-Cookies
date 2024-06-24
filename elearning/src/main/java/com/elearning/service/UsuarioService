@@ -1,0 +1,12 @@
+package com.service;
+
+import com.entity.Usuario;
+import java.util.List;
+
+public interface UsuarioService {
+    Usuario createUsuario(Usuario usuario);
+    Usuario updateUsuario(Usuario usuario);
+    void deleteUsuario(int id);
+    Usuario getUsuarioById(int id);
+    List<Usuario> getAllUsuarios();
+}

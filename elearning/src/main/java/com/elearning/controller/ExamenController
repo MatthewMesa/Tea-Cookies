@@ -1,0 +1,48 @@
+package com.controller;
+
+import com.entity.Examen;
+import com.service.ExamenService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/examenes")
+public class ExamenController {
+
+    @Autowired
+    private ExamenService examenService;
+
+    @PostMapping
+    public ResponseEntity<Examen> createExamen(@RequestBody Examen examen) {
+        Examen createdExamen = examenService.createExamen(examen);
+        return ResponseEntity.ok(createdExamen);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Examen> updateExamen(@PathVariable int id, @RequestBody Examen examen) {
+        examen.setId(id); // Asume que la entidad Examen tiene un campo 'id'
+        Examen updatedExamen = examenService.updateExamen(examen);
+        return ResponseEntity.ok(updatedExamen);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteExamen(@PathVariable int id) {
+        examenService.deleteExamen(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Examen> getExamenById(@PathVariable int id) {
+        Examen examen = examenService.getExamenById(id);
+        return ResponseEntity.ok(examen);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Examen>> getAllExamenes() {
+        List<Examen> examenes = examenService.getAllExamenes();
+        return ResponseEntity.ok(examenes);
+    }
+}

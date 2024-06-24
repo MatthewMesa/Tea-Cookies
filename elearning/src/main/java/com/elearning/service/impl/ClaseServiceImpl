@@ -1,0 +1,43 @@
+package com.service.impl;
+
+import com.entity.Clase;
+import com.repository.ClaseRepository;
+import com.service.ClaseService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class ClaseServiceImpl implements ClaseService {
+
+    @Autowired
+    private ClaseRepository claseRepository;
+
+    @Override
+    public Clase createClase(Clase clase) {
+        return claseRepository.save(clase);
+    }
+
+    @Override
+    public Clase updateClase(Clase clase) {
+        return claseRepository.save(clase);
+    }
+
+    @Override
+    public void deleteClase(int id) {
+        claseRepository.deleteById(id);
+    }
+
+    @Override
+    public Clase getClaseById(int id) {
+        Optional<Clase> optionalClase = claseRepository.findById(id);
+        return optionalClase.orElse(null);
+    }
+
+    @Override
+    public List<Clase> getAllClases() {
+        return claseRepository.findAll();
+    }
+}

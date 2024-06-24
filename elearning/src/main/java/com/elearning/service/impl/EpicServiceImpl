@@ -1,0 +1,43 @@
+package com.service.impl;
+
+import com.entity.Epic;
+import com.repository.EpicRepository;
+import com.service.EpicService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class EpicServiceImpl implements EpicService {
+
+    @Autowired
+    private EpicRepository epicRepository;
+
+    @Override
+    public Epic createEpic(Epic epic) {
+        return epicRepository.save(epic);
+    }
+
+    @Override
+    public Epic updateEpic(Epic epic) {
+        return epicRepository.save(epic);
+    }
+
+    @Override
+    public void deleteEpic(int id) {
+        epicRepository.deleteById(id);
+    }
+
+    @Override
+    public Epic getEpicById(int id) {
+        Optional<Epic> optionalEpic = epicRepository.findById(id);
+        return optionalEpic.orElse(null);
+    }
+
+    @Override
+    public List<Epic> getAllEpics() {
+        return epicRepository.findAll();
+    }
+}

@@ -1,0 +1,48 @@
+package com.controller;
+
+import com.entity.CriterioAceptacion;
+import com.service.CriterioAceptacionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/criteriosAceptacion")
+public class CriterioAceptacionController {
+
+    @Autowired
+    private CriterioAceptacionService criterioAceptacionService;
+
+    @PostMapping
+    public ResponseEntity<CriterioAceptacion> createCriterioAceptacion(@RequestBody CriterioAceptacion criterioAceptacion) {
+        CriterioAceptacion createdCriterioAceptacion = criterioAceptacionService.createCriterioAceptacion(criterioAceptacion);
+        return ResponseEntity.ok(createdCriterioAceptacion);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CriterioAceptacion> updateCriterioAceptacion(@PathVariable int id, @RequestBody CriterioAceptacion criterioAceptacion) {
+        criterioAceptacion.setId(id); // Asume que la entidad CriterioAceptacion tiene un campo 'id'
+        CriterioAceptacion updatedCriterioAceptacion = criterioAceptacionService.updateCriterioAceptacion(criterioAceptacion);
+        return ResponseEntity.ok(updatedCriterioAceptacion);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCriterioAceptacion(@PathVariable int id) {
+        criterioAceptacionService.deleteCriterioAceptacion(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CriterioAceptacion> getCriterioAceptacionById(@PathVariable int id) {
+        CriterioAceptacion criterioAceptacion = criterioAceptacionService.getCriterioAceptacionById(id);
+        return ResponseEntity.ok(criterioAceptacion);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CriterioAceptacion>> getAllCriteriosAceptacion() {
+        List<CriterioAceptacion> criteriosAceptacion = criterioAceptacionService.getAllCriteriosAceptacion();
+        return ResponseEntity.ok(criteriosAceptacion);
+    }
+}

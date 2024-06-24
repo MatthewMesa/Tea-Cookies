@@ -1,0 +1,43 @@
+package com.service.impl;
+
+import com.entity.CursoExamen;
+import com.repository.CursoExamenRepository;
+import com.service.CursoExamenService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class CursoExamenServiceImpl implements CursoExamenService {
+
+    @Autowired
+    private CursoExamenRepository cursoExamenRepository;
+
+    @Override
+    public CursoExamen createCursoExamen(CursoExamen cursoExamen) {
+        return cursoExamenRepository.save(cursoExamen);
+    }
+
+    @Override
+    public CursoExamen updateCursoExamen(CursoExamen cursoExamen) {
+        return cursoExamenRepository.save(cursoExamen);
+    }
+
+    @Override
+    public void deleteCursoExamen(int id) {
+        cursoExamenRepository.deleteById(id);
+    }
+
+    @Override
+    public CursoExamen getCursoExamenById(int id) {
+        Optional<CursoExamen> optionalCursoExamen = cursoExamenRepository.findById(id);
+        return optionalCursoExamen.orElse(null);
+    }
+
+    @Override
+    public List<CursoExamen> getAllCursoExamenes() {
+        return cursoExamenRepository.findAll();
+    }
+}

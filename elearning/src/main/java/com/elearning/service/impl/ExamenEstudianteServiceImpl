@@ -1,0 +1,43 @@
+package com.service.impl;
+
+import com.entity.ExamenEstudiante;
+import com.repository.ExamenEstudianteRepository;
+import com.service.ExamenEstudianteService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class ExamenEstudianteServiceImpl implements ExamenEstudianteService {
+
+    @Autowired
+    private ExamenEstudianteRepository examenEstudianteRepository;
+
+    @Override
+    public ExamenEstudiante createExamenEstudiante(ExamenEstudiante examenEstudiante) {
+        return examenEstudianteRepository.save(examenEstudiante);
+    }
+
+    @Override
+    public ExamenEstudiante updateExamenEstudiante(ExamenEstudiante examenEstudiante) {
+        return examenEstudianteRepository.save(examenEstudiante);
+    }
+
+    @Override
+    public void deleteExamenEstudiante(int id) {
+        examenEstudianteRepository.deleteById(id);
+    }
+
+    @Override
+    public ExamenEstudiante getExamenEstudianteById(int id) {
+        Optional<ExamenEstudiante> optionalExamenEstudiante = examenEstudianteRepository.findById(id);
+        return optionalExamenEstudiante.orElse(null);
+    }
+
+    @Override
+    public List<ExamenEstudiante> getAllExamenEstudiantes() {
+        return examenEstudianteRepository.findAll();
+    }
+}

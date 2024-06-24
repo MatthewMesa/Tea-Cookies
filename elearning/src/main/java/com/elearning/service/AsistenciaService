@@ -1,0 +1,12 @@
+package com.service;
+
+import com.entity.Asistencia;
+import java.util.List;
+
+public interface AsistenciaService {
+    Asistencia createAsistencia(Asistencia asistencia);
+    Asistencia updateAsistencia(Asistencia asistencia);
+    void deleteAsistencia(int id);
+    Asistencia getAsistenciaById(int id);
+    List<Asistencia> getAllAsistencias();
+}

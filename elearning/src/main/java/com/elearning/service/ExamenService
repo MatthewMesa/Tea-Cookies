@@ -1,0 +1,12 @@
+package com.service;
+
+import com.entity.Examen;
+import java.util.List;
+
+public interface ExamenService {
+    Examen createExamen(Examen examen);
+    Examen updateExamen(Examen examen);
+    void deleteExamen(int id);
+    Examen getExamenById(int id);
+    List<Examen> getAllExamenes();
+}

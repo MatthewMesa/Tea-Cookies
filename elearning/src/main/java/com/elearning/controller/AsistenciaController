@@ -1,0 +1,48 @@
+package com.controller;
+
+import com.entity.Asistencia;
+import com.service.AsistenciaService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/asistencias")
+public class AsistenciaController {
+
+    @Autowired
+    private AsistenciaService asistenciaService;
+
+    @PostMapping
+    public ResponseEntity<Asistencia> createAsistencia(@RequestBody Asistencia asistencia) {
+        Asistencia createdAsistencia = asistenciaService.createAsistencia(asistencia);
+        return ResponseEntity.ok(createdAsistencia);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Asistencia> updateAsistencia(@PathVariable int id, @RequestBody Asistencia asistencia) {
+        asistencia.setId(id); // Asume que la entidad Asistencia tiene un campo 'id'
+        Asistencia updatedAsistencia = asistenciaService.updateAsistencia(asistencia);
+        return ResponseEntity.ok(updatedAsistencia);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAsistencia(@PathVariable int id) {
+        asistenciaService.deleteAsistencia(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Asistencia> getAsistenciaById(@PathVariable int id) {
+        Asistencia asistencia = asistenciaService.getAsistenciaById(id);
+        return ResponseEntity.ok(asistencia);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Asistencia>> getAllAsistencias() {
+        List<Asistencia> asistencias = asistenciaService.getAllAsistencias();
+        return ResponseEntity.ok(asistencias);
+    }
+}

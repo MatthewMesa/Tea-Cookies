@@ -1,0 +1,43 @@
+package com.service.impl;
+
+import com.entity.Ejercicio;
+import com.repository.EjercicioRepository;
+import com.service.EjercicioService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class EjercicioServiceImpl implements EjercicioService {
+
+    @Autowired
+    private EjercicioRepository ejercicioRepository;
+
+    @Override
+    public Ejercicio createEjercicio(Ejercicio ejercicio) {
+        return ejercicioRepository.save(ejercicio);
+    }
+
+    @Override
+    public Ejercicio updateEjercicio(Ejercicio ejercicio) {
+        return ejercicioRepository.save(ejercicio);
+    }
+
+    @Override
+    public void deleteEjercicio(int id) {
+        ejercicioRepository.deleteById(id);
+    }
+
+    @Override
+    public Ejercicio getEjercicioById(int id) {
+        Optional<Ejercicio> optionalEjercicio = ejercicioRepository.findById(id);
+        return optionalEjercicio.orElse(null);
+    }
+
+    @Override
+    public List<Ejercicio> getAllEjercicios() {
+        return ejercicioRepository.findAll();
+    }
+}

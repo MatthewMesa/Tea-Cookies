@@ -1,0 +1,12 @@
+package com.service;
+
+import com.entity.CriterioAceptacion;
+import java.util.List;
+
+public interface CriterioAceptacionService {
+    CriterioAceptacion createCriterioAceptacion(CriterioAceptacion criterioAceptacion);
+    CriterioAceptacion updateCriterioAceptacion(CriterioAceptacion criterioAceptacion);
+    void deleteCriterioAceptacion(int id);
+    CriterioAceptacion getCriterioAceptacionById(int id);
+    List<CriterioAceptacion> getAllCriteriosAceptacion();
+}
